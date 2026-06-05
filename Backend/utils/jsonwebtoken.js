@@ -15,7 +15,7 @@ const generateToken = async (user) => {
 
 }
 
-const verifyToken = async (token, JWT_SECRET) => {
+const verifyToken = async (token) => {
  return jwt.verify(token, JWT_SECRET)
 }
 

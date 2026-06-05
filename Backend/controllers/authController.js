@@ -31,7 +31,7 @@ const login = async (req, res) => {
             })
             return
         }
-        if(existinguser.status !== "ACTIVE" && existinguser.role === "USER"){
+        if (existinguser.status !== "ACTIVE" && existinguser.role === "USER") {
             res.status(400).json({
                 message: "**login this user is blocked by admin"
             })
@@ -61,7 +61,8 @@ const login = async (req, res) => {
         return res
             .cookie("token", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                secure: true,
+                sameSite: "none",
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
             .status(200)
@@ -130,4 +131,25 @@ const register = async (req, res) => {
     }
 }
 
-module.exports = { login, register };
+const logout = async (req, res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none"
+        });
+
+        return res.status(200).json({
+            message: "Logged out successfully"
+        });
+
+    } catch (e) {
+        console.log(e);
+
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+module.exports = { login, register, logout };
