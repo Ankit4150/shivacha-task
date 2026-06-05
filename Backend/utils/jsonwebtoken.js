@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken')
 
-const JWT_SECRET = process.env.JWT_SECRET || "tkhmtyhmtyjhytht"
+const JWT_SECRET = process.env.JWT_SECRET || "jtngjrnrjnfjrnfrjnjrenek"
 
 const generateToken = async (user) => {
-
+    
     const token = jwt.sign({
         id: user._id,
+        name: user.name,
         role: user.role
     }, JWT_SECRET, {
         expiresIn: "2h"

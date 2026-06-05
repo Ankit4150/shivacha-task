@@ -12,7 +12,8 @@ const seed = async () => {
   const password = await hashPassword("12345678")
 
   await admin.create({
-     username: "lallan@gmail.com", 
+     name: "admin",
+     username: "admin@gmail.com", 
      password: password, 
     });
 
