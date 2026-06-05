@@ -17,4 +17,5 @@ const fetchAllUser = async (req, res) => {
     }
 };
 
+
 module.exports = fetchAllUser;
