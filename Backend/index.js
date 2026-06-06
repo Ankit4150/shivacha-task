@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-<<<<<<< HEAD
+
 // const adminRoute = require('../routes/adminRoutes')
 const userRoute = require('../Backend/routes/userRoute')
 const connectDB = require('../Backend/dbConfig/connectDB')
@@ -23,21 +23,8 @@ connectDB()
 app.use('/v1/admin/', adminRoute)
 app.use('/v1/user/', userRoute)
 app.use('/v1/', featureRoute)
-=======
-const userRoute = require('../Backend/routes/userRoute')
-const connectDB = require('../Backend/dbConfig/connectDB')
-const adminRoute = require('../Backend/routes/adminRoutes')
-
-app.use(express.json())
-app.use(cors())
-
-connectDB()
 
 
-
-app.use('/v1/admin', adminRoute)
-app.use('/v1/user/', userRoute)
->>>>>>> 6830469 (new chages)
 
 // for testing the surver methods are working
 // app.get('/test', (req, res)=> {
