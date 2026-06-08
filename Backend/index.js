@@ -6,15 +6,16 @@ const cors = require('cors')
 const adminRoute = require('./routes/adminRoutes')
 const userRoute = require("./routes/userRoute")
 const connectDB = require("./dbConfig/connectDB");
-   const featureRoute = require("./routes/featureRoute")
-   const attendanceRoute = require("./routes/attendance");
-   const authRoute=require("./routes/authRoute");
-   require("dotenv").config();
+const featureRoute = require("./routes/featureRoute")
+const attendanceRoute = require("./routes/attendance");
+const authRoute=require("./routes/authRoute");
+require("dotenv").config();
 
 const cookieParser = require('cookie-parser')
 const protectMiddleware = require('./middleware/protectMiddleware')
 
 const testRoute = require("./routes/testRoute");
+const taskRoute = require('./routes/taskRoute')
 
 
 app.use(express.json())
@@ -28,23 +29,12 @@ app.use(cookieParser())
 app.use('/v1/admin/', adminRoute)
 app.use('/v1/user/', userRoute)
 app.use('/v1/', featureRoute)
-
 app.use("/v1/test", testRoute);
 app.use("/v1/attendance", attendanceRoute);
- 
- app.use('/api/auth', authRoute)
+app.use('/api/auth', authRoute)
+app.use('/v1/assign-task', taskRoute)
 
 
-// for testing the surver methods are working
-// app.get('/test', (req, res)=> {
-//         res.json({
-//             message: "me endpoint is running"
-//         })    
-// })
-
-// app.listen((3000), ()=>{
-//     console.log('server is running at port 3000')
-// })
 const PORT = 3000;
 const startServer = async () => {
   try {
