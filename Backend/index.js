@@ -32,7 +32,7 @@ app.use('/v1/', featureRoute)
 app.use("/v1/test", testRoute);
 app.use("/v1/attendance", attendanceRoute);
 app.use('/api/auth', authRoute)
-app.use('/v1/assign-task', taskRoute)
+app.use('/v1/task', taskRoute)
 
 
 const PORT = 3000;
