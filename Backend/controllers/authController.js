@@ -2,9 +2,12 @@ const { hashPassword, comparePassword } = require('../utils/passwordHashing');
 const admin = require('../models/adminModel');
 const { generateToken } = require('../utils/jsonwebtoken');
 const user = require('../models/userModel')
-
+const {generateOTP,sendOTP}=require("../utils/mailer")
+ 
+const otpStore={};
 
 const login = async (req, res) => {
+    console.log("Login Data:", req.body);
     try {
         const { username, password, role } = req.body;
 
@@ -46,32 +49,37 @@ const login = async (req, res) => {
             })
             return
         }
+         const otp = generateOTP();
+        console.log(otp);
+        otpStore[username] = {
+            otp,
+            expireAt: Date.now() + 5 * 60 * 1000
+        };
 
-        const token = await generateToken(existinguser)
+        await sendOTP(username, otp);
+        res.json({
+            message: 'OTP sent to your email'
+        });
+
+     //   const token = await generateToken(existinguser)
 
 
-        // res.cookie("token",token).status(200).json({
-        //     message: "**login Loged In Successfully",
-        //     username: existinguser.username,
-        //     token: token,
-        //     role: existinguser.role
+      
 
-        // })
-
-        return res
-            .cookie("token", token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            })
-            .status(200)
-            .json({
-                message: "Logged In Successfully",
-                username: existinguser.username,
-                role: existinguser.role,
-                token
-            });
+        // return res
+        //     .cookie("token", token, {
+        //         httpOnly: true,
+        //         secure: false,
+        //         sameSite: "lax",
+        //         maxAge: 7 * 24 * 60 * 60 * 1000
+        //     })
+        //     .status(200)
+        //     .json({
+        //         message: "Logged In Successfully",
+        //         username: existinguser.username,
+        //         role: existinguser.role,
+        //         token
+        //     });
 
     } catch (e) {
         console.log(e)
@@ -106,12 +114,38 @@ const register = async (req, res) => {
 
         const hashedPassword = await hashPassword(password)
 
-        const newUser = await user.create({
-            name: name,
-            username: username,
-            password: hashedPassword,
-            role: role
-        })
+        // const newUser = await user.create({
+        //     name: name,
+        //     username: username,
+        //     password: hashedPassword,
+        //     role: role
+        // })
+        if (role === "admin" || role === "ADMIN") {
+    const newAdmin = await admin.create({
+        name,
+        username,
+        password: hashedPassword,
+        role: "ADMIN"
+    });
+
+    return res.status(200).json({
+        message: "Admin Registered Successfully",
+        username: newAdmin.username,
+        role: newAdmin.role
+    });
+}
+const newUser = await user.create({
+    name,
+    username,
+    password: hashedPassword,
+    role: "USER"
+});
+
+return res.status(200).json({
+    message: "User Registered Successfully",
+    username: newUser.username,
+    role: newUser.role
+});
 
 
         res.status(200).json({
@@ -135,8 +169,8 @@ const logout = async (req, res) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,
-            secure: true,
-            sameSite: "none"
+            secure: false,
+            sameSite: "lax"
         });
 
         return res.status(200).json({
@@ -152,4 +186,70 @@ const logout = async (req, res) => {
     }
 }
 
-module.exports = { login, register, logout };
+const verifyOTP = async (req, res) => {
+    try {
+        const { username, otp } = req.body;
+
+        const record = otpStore[username];
+
+        if (!record) {
+            return res.status(400).json({
+                message: "OTP not requested"
+            });
+        }
+
+        if (Date.now() > record.expiresAt) {
+            delete otpStore[username];
+
+            return res.status(400).json({
+                message: "OTP expired"
+            });
+        }
+
+        if (String(record.otp) !== String(otp)) {
+            return res.status(400).json({
+                message: "Invalid OTP"
+            });
+        }
+
+        delete otpStore[username];
+
+        const existinguser =
+            await admin.findOne({ username }) ||
+            await user.findOne({ username });
+
+        if (!existinguser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        const token = await generateToken(existinguser);
+
+         return res
+            .cookie("token", token, {
+                httpOnly: true,
+                secure: false,
+                sameSite: "lax",
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            })
+            .status(200)
+            .json({
+                message: "Logged In Successfully",
+                username: existinguser.username,
+                role: existinguser.role,
+                token
+            });
+
+    } catch (e) {
+        console.log(e);
+
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+};
+
+
+
+module.exports = { login, register, logout ,verifyOTP};

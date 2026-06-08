@@ -7,8 +7,9 @@ const attendanceUpdate = require('../controllers/attendanceUpdate');
 
 const featureRoute = express.Router();
 
-featureRoute.get('/me', getUserByID )
+featureRoute.get('/me', protectMiddleware,getUserByID )
 featureRoute.get('/alluser',protectMiddleware, fetchAllUser )
-featureRoute.put('/attendance/:id', attendanceUpdate)
 
-module.exports = featureRoute;
+
+
+module.exports = featureRoute;  

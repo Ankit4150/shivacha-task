@@ -1,70 +1,129 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import summeryapi from "../common";
+import { toast } from "react-toastify";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 function Login() {
+  const { getUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
+    role: "user",
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch(summeryapi.login.url, {
+        method: summeryapi.login.method,
+        credentials:"include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      console.log("Sending Data:", formData);
 
-    const data = await response.json();
+      const data = await response.json();
 
-    localStorage.setItem("token", data.token);
+      console.log("data", data);
 
-    if (data.role === "ADMIN") {
-      navigate("/admin");
-    } else if (data.role === "USER") {
-      navigate("/employee");
-    } 
+      if (!response.ok) {
+        toast.error(data.message || "Login Failed");
+        return;
+      }
+        await getUserDetails();
+     
+if (
+  data.role &&
+  data.role.toUpperCase() !== formData.role.toUpperCase()
+) {
+  toast.error("Please select the correct role");
+  return;
+}
+   
+
+      // toast.success("Login Successful!");
+      // console.log("Role From API:", data.role);
+      // setTimeout(() => {
+      //   if (data.role === "ADMIN") {
+
+      //     navigate("/admin");
+      //   } else if (data.role === "USER") {
+      //     navigate("/employee");
+      //   }
+      // }, 1000);
+      toast.success("OTP sent to your email");
+
+navigate("/verify-otp", {
+  state: {
+    username: formData.username,
+  },
+});
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong!");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Login
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+         
           <input
             type="email"
-            name="email"
+            name="username"
             placeholder="Enter Email"
+            value={formData.username}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border rounded-lg"
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
           />
 
+        
           <input
             type="password"
             name="password"
             placeholder="Enter Password"
+            value={formData.password}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border rounded-lg"
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
           />
 
+      
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+
+        
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
           >
             Login
           </button>
@@ -72,7 +131,10 @@ function Login() {
 
         <p className="text-center mt-4">
           Don't have an account?{" "}
-          <Link to="/Signup" className="text-blue-600">
+          <Link
+            to="/Signup"
+            className="text-blue-600 font-semibold hover:underline"
+          >
             Register
           </Link>
         </p>
