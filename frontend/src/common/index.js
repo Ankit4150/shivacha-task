@@ -51,7 +51,12 @@ attendanceMonthly: {
  verifyOtp: {
       url: `${backendDomain}/api/auth/verify-otp`,
   method: "post"
+},
+assigntask:{
+    url: `${backendDomain}/v1/assign-task`,
+  method: "post"
 }
+
     
     
 }
