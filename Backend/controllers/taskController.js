@@ -25,7 +25,7 @@ const assignTask = async (req, res) => {
 
         const taskAssigned = await task.create({
             employee: employee._id,
-            assignBy: req.id,
+            assignBy: req.user.id,
             taskName,
             taskDescription
         })

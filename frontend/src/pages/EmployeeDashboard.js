@@ -42,12 +42,12 @@ function EmployeeDashboard() {
 
     fetchData();
   }, []);
+  
 
   const totalTasks = myTasks.length;
   const completedTasks = myTasks.filter((t) => t.status === "DONE").length;
   const pendingTasks = myTasks.filter((t) => t.status !== "DONE").length;
 
-  // 🔥 FILTERS BASED ON MENU
   const filteredTasks =
     activeMenu === "completed"
       ? myTasks.filter((t) => t.status === "DONE")
@@ -57,16 +57,12 @@ function EmployeeDashboard() {
 
   return (
     <div className="flex min-h-screen bg-slate-100">
-
-      {/* ================= SIDEBAR ================= */}
       <div className="w-64 bg-gray-800 text-white flex flex-col">
 
         <div className="p-6 text-2xl font-bold border-b border-gray-700">
           EMS
         </div>
-
         <ul className="flex-1">
-
           <li
             onClick={() => setActiveMenu("dashboard")}
             className={`p-4 cursor-pointer hover:bg-gray-700 ${
@@ -104,11 +100,7 @@ function EmployeeDashboard() {
           </li>
         </ul>
       </div>
-
-      {/* ================= MAIN CONTENT ================= */}
       <div className="flex-1 p-6">
-
-        {/* HEADER */}
         <div className="bg-white p-5 rounded-xl shadow-md mb-6 flex justify-between">
           <div>
             <h1 className="text-2xl font-bold">Employee Dashboard</h1>
@@ -122,8 +114,6 @@ function EmployeeDashboard() {
             <p className="text-sm text-gray-500">{user?.email}</p>
           </div>
         </div>
-
-        {/* ================= DASHBOARD ================= */}
         {activeMenu === "dashboard" && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -149,23 +139,16 @@ function EmployeeDashboard() {
               </div>
 
             </div>
-
-            {/* TASK TABLE */}
             <TaskTable tasks={filteredTasks} />
           </>
         )}
-
-        {/* ================= ATTENDANCE ================= */}
         {activeMenu === "attendance" && (
   <AttendanceCalendar />
 )}
 
-        {/* ================= COMPLETED ================= */}
         {activeMenu === "completed" && (
           <TaskTable tasks={filteredTasks} />
         )}
-
-        {/* ================= PENDING ================= */}
         {activeMenu === "pending" && (
           <TaskTable tasks={filteredTasks} />
         )}
@@ -175,7 +158,6 @@ function EmployeeDashboard() {
   );
 }
 
-/* 🔥 REUSABLE TASK TABLE */
 function TaskTable({ tasks }) {
   return (
     <div className="bg-white p-5 rounded-xl shadow-md mt-6">

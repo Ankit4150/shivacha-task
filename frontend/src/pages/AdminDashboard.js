@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Summaryapi from "../common";
 import { UserContext } from "../context/UserContext";
+import { toast } from "react-toastify";
 
 function AdminDashboard() {
   const { userDetails } = useContext(UserContext);
@@ -156,16 +157,19 @@ const handleAssignTask = async () => {
 
     const data = await response.json();
 
-    if (data.success) {
-      alert("Task Assigned Successfully");
+   if (response.ok) {
+  //alert("Task Assigned Successfully");
+ toast.success("Task Assigned Successfully");
 
-      setShowTaskModal(false);
+  setShowTaskModal(false);
 
-      setTaskData({
-        taskName: "",
-        taskDescription: "",
-      });
-    }
+  setTaskData({
+    taskName: "",
+    taskDescription: "",
+  });
+
+  setSelectedEmployee(null);
+}
   } catch (error) {
     console.log(error);
   }
@@ -437,14 +441,30 @@ const handleAssignTask = async () => {
             rows="4"
           />
 
-          <button
-            onClick={handleAssignTask}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Assign
-          </button>
+        <div className="flex justify-end gap-2 mt-4">
+  <button
+    onClick={() => {
+      setShowTaskModal(false);
+      setTaskData({
+        taskName: "",
+        taskDescription: "",
+      });
+    }}
+    className="px-4 py-2 bg-gray-500 text-white rounded"
+  >
+    Cancel
+  </button>
+
+  <button
+    onClick={handleAssignTask}
+    className="px-4 py-2 bg-blue-600 text-white rounded"
+  >
+    Assign
+  </button>
+        </div>
         </div>
       </div>
+      
     )}
       </>
   );
