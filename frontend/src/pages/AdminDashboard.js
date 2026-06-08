@@ -9,6 +9,15 @@ function AdminDashboard() {
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+
+const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+const [taskData, setTaskData] = useState({
+  taskName: "",
+  taskDescription: "",
+});
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -37,7 +46,7 @@ function AdminDashboard() {
     fetchUsers();
   }, []);
 
-  // ✅ LOGOUT FUNCTION
+ 
   const handleLogout = async () => {
      console.log("Logout clicked");
     try {
@@ -46,7 +55,7 @@ function AdminDashboard() {
         credentials: "include",
       });
 
-      // clear frontend state (optional)
+
       window.location.href = "/";
     } catch (error) {
       console.log("Logout Error:", error);
@@ -124,14 +133,52 @@ const handleRemoveUser = async (userId) => {
     console.log(error);
   }
 };
+const openTaskModal = (employee) => {
+  setSelectedEmployee(employee);
+  setShowTaskModal(true);
+};
+const handleAssignTask = async () => {
+  try {
+    const response = await fetch(
+      `${Summaryapi.assigntask.url}/${selectedEmployee._id}`,
+      {
+        method: Summaryapi.assigntask.method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          taskName: taskData.taskName,
+          taskDescription: taskData.taskDescription,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert("Task Assigned Successfully");
+
+      setShowTaskModal(false);
+
+      setTaskData({
+        taskName: "",
+        taskDescription: "",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
+      <>
    <div className="flex min-h-screen bg-slate-100">
 
-      {/* SIDEBAR */}
+   
       <div className="w-64 bg-gray-800 text-white flex flex-col min-h-screen">
 
-        {/* TOP MENU */}
+    
         <div>
         <div className="p-6 text-3xl font-bold text-center border-b border-gray-700">
   EMS
@@ -158,7 +205,7 @@ const handleRemoveUser = async (userId) => {
           </ul>
         </div>
 
-        {/* BOTTOM LOGOUT BUTTON */}
+       
         <div className="mt-auto p-4 border-t border-gray-700">
           <button
            
@@ -172,7 +219,7 @@ const handleRemoveUser = async (userId) => {
 
       </div>
 
-      {/* MAIN CONTENT (same as your code) */}
+      
       <div className="flex-1">
        <div className="bg-white shadow-md px-8 py-5 flex justify-between items-center">
   <div>
@@ -204,7 +251,7 @@ const handleRemoveUser = async (userId) => {
 
         <div className="p-6">
 
-          {/* DASHBOARD */}
+         
           {activeMenu === "dashboard" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
   <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-6 rounded-xl shadow-lg">
@@ -240,7 +287,7 @@ const handleRemoveUser = async (userId) => {
             <div className="mb-5">
   <input
     type="text"
-    placeholder="🔍 Search employee..."
+    placeholder=" Search employee"
     value={search}
     onChange={(e) => {
       setSearch(e.target.value);
@@ -250,7 +297,7 @@ const handleRemoveUser = async (userId) => {
   />
 </div>
 
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-white rounded-xl shadow overflow-hidden">
                 <table className="w-full">
    <thead>
   <tr className="bg-gray-800 text-white">
@@ -260,6 +307,9 @@ const handleRemoveUser = async (userId) => {
     <th className="p-3 text-left">Role</th>
     <th className="p-3 text-left">Status</th>
     <th className="p-3 text-left">Action</th>
+    <th className="p-3 text-left">Assign Task</th>
+    
+    
   </tr>
 </thead>
 
@@ -323,6 +373,14 @@ const handleRemoveUser = async (userId) => {
     Remove
   </button>
 </td>
+<td className="p-3">
+  <button
+    onClick={() => openTaskModal(emp)}
+    className="px-3 py-1 bg-blue-600 text-white rounded"
+  >
+    Assign Task
+  </button>
+</td>
       </tr>
     ))
   ) : (
@@ -346,7 +404,51 @@ const handleRemoveUser = async (userId) => {
         </div>
       </div>
     </div>
+    {showTaskModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg w-[450px]">
+          <h2 className="text-xl font-bold mb-4">
+            Assign Task
+          </h2>
+
+          <input
+            type="text"
+            placeholder="Task Name"
+            value={taskData.taskName}
+            onChange={(e) =>
+              setTaskData({
+                ...taskData,
+                taskName: e.target.value,
+              })
+            }
+            className="w-full border p-2 rounded mb-3"
+          />
+
+          <textarea
+            placeholder="Task Description"
+            value={taskData.taskDescription}
+            onChange={(e) =>
+              setTaskData({
+                ...taskData,
+                taskDescription: e.target.value,
+              })
+            }
+            className="w-full border p-2 rounded mb-3"
+            rows="4"
+          />
+
+          <button
+            onClick={handleAssignTask}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Assign
+          </button>
+        </div>
+      </div>
+    )}
+      </>
   );
+  
 }
 
 export default AdminDashboard;
