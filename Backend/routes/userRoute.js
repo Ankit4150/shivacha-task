@@ -8,8 +8,8 @@ const protectMiddleware = require('../middleware/protectMiddleware');
 const userRoute = express.Router();
 
 userRoute.post("/register/", register)
-userRoute.post('/login', login)
-userRoute.post( '/logout', logout)
+// userRoute.post('/login', login)
+// userRoute.post( '/logout', logout)
 userRoute.put('/update/:id',protectMiddleware, updateUser)
 userRoute.post('/addemployee/:id',protectMiddleware, addEmployeeDetail)
 

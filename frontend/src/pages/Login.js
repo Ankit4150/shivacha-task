@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import summeryapi from "../common";
 import { toast } from "react-toastify";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 function Login() {
+  const { getUserDetails } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -13,6 +16,7 @@ function Login() {
   });
 
   const handleChange = (e) => {
+    
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -31,33 +35,44 @@ function Login() {
         },
         body: JSON.stringify(formData),
       });
+      console.log("Sending Data:", formData);
 
       const data = await response.json();
 
-     // console.log("data", data);
+      console.log("data", data);
 
       if (!response.ok) {
         toast.error(data.message || "Login Failed");
         return;
       }
+        await getUserDetails();
+     
+if (
+  data.role &&
+  data.role.toUpperCase() !== formData.role.toUpperCase()
+) {
+  toast.error("Please select the correct role");
+  return;
+}
+   
 
-      // Optional role validation
-      if (data.role && data.role !== formData.role) {
-        toast.error("Please select the correct role");
-        return;
-      }
+      // toast.success("Login Successful!");
+      // console.log("Role From API:", data.role);
+      // setTimeout(() => {
+      //   if (data.role === "ADMIN") {
 
-      localStorage.setItem("token", data.token);
+      //     navigate("/admin");
+      //   } else if (data.role === "USER") {
+      //     navigate("/employee");
+      //   }
+      // }, 1000);
+      toast.success("OTP sent to your email");
 
-      toast.success("Login Successful!");
-
-      setTimeout(() => {
-        if (data.role === "ADMIN") {
-          navigate("/admin");
-        } else if (data.role === "USER") {
-          navigate("/employee");
-        }
-      }, 1000);
+navigate("/verify-otp", {
+  state: {
+    username: formData.username,
+  },
+});
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong!");
@@ -72,7 +87,7 @@ function Login() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
+         
           <input
             type="email"
             name="username"
@@ -83,7 +98,7 @@ function Login() {
             className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {/* Password */}
+        
           <input
             type="password"
             name="password"
@@ -94,7 +109,7 @@ function Login() {
             className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {/* Role Select */}
+      
           <select
             name="role"
             value={formData.role}
@@ -105,7 +120,7 @@ function Login() {
             <option value="ADMIN">ADMIN</option>
           </select>
 
-          {/* Login Button */}
+        
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"

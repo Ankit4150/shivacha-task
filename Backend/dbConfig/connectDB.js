@@ -1,17 +1,15 @@
 const mongoose = require("mongoose");
 
+module.exports = async function connectDB() {
+  if (mongoose.connection.readyState === 1) return;
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://hs348961_db_user:hT1dGIaysmI4HEj0@cluster0.ufil94v.mongodb.net/?appName=Cluster0";
+  await mongoose.connect("mongodb://127.0.0.1:27017/employeeDBy");
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(MONGO_URI);
-
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error("MongoDB Connection Failed:", error.message);
-    process.exit(1);
-  }
+  console.log("MongoDB Connected");
 };
 
-module.exports = connectDB;
+
+
+
+
+
