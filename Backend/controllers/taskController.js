@@ -47,7 +47,7 @@ const assignTask = async (req, res) => {
 
 const getAllTask = async (req, res) => {
     try {
-        const allTask = await task.findById({
+        const allTask = await task.find({
             employee: req.user.id
         })
 
@@ -66,19 +66,22 @@ const getAllTask = async (req, res) => {
 const getTask = async (req, res) => {
 
     try {
-        const { id } = req.params;
+        const { taskid } = req.params;
+        
 
-        if (!id) {
+        if (!taskid) {
             res.status(400).json({
                 message: "Invalid task id"
             })
             return
         }
 
-        const task = await task.findById(id)
-
-        res.status(201).json({
-            task
+        const taskdata = await task.findById(taskid).populate("assignBy", "name");
+       
+       console.log("taskdata",taskdata)
+   
+       res.status(201).json({
+            taskdata
         })
     } catch (error) {
         console.log(error)
@@ -87,5 +90,38 @@ const getTask = async (req, res) => {
         })
     }
 }
+const updateTask = async (req, res) => {
+    try {
 
-module.exports = { assignTask, getAllTask, getTask };
+    const { taskid} = req.params;    
+    const {status} = req.body;
+    console.log("id ",taskid);
+    console.log("status",status)
+
+    if(!taskid || !status){
+        res.status(400).json({
+            message: "both task id and updated status needed"
+        })
+    }
+
+    const taskData = await task.findByIdAndUpdate(
+        taskid,
+        {status}
+    )    
+    console.log("updatedtata",taskData)
+    res.status(201).json({
+        message: "task updated",
+        taskData
+
+    })
+    
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: 'Internal server error'
+        })
+    }
+
+}
+
+module.exports = { assignTask, getAllTask, getTask,updateTask };

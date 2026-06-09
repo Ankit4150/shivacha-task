@@ -53,11 +53,22 @@ attendanceMonthly: {
   method: "post"
 },
 assigntask:{
-    url: `${backendDomain}/v1/assign-task`,
+    url: `${backendDomain}/v1/task/assign-task`,
   method: "post"
+},
+   mytask:{
+    url: `${backendDomain}/v1/task`,
+  method: "get"
 }
-
-    
+,
+   gettaskbyid:{
+    url: `${backendDomain}/v1/task`,
+  method: "get"
+},
+updateTaskStatus: {
+  url: `${backendDomain}/v1/task/update`,
+  method: "put",
+},
     
 }
 

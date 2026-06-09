@@ -3,12 +3,12 @@ const mongoose = require('mongoose')
 const taskModel = mongoose.Schema({
     employee: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user", // Model name of User
+        ref: "user", 
         required: true,
     },
     assignBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "admin", // Model name of Admin
+        ref: "admin", 
         required: true,
     },
     taskName: {
@@ -22,7 +22,7 @@ const taskModel = mongoose.Schema({
     status: {
         type: String,
         default: 'Pending',
-        enum: ["Pending", "Completed",]
+        enum: ["Pending", "Completed","abort"]
     }
 },
     {
